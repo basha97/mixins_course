@@ -5,16 +5,27 @@ extension Log on Object {
   void log() => devtools.log(toString());
 }
 
-mixin CanRun {
+abstract class Animal {
+  const Animal();
+}
+
+mixin CanRun on Animal {
   int get speed;
   void run() {
     "Running at the speed of $speed".log();
   }
 }
 
-class Cat with CanRun {
+class Cat extends Animal with CanRun {
   @override
   int speed = 20;
+}
+
+class Dog with CanRun{
+  @override
+  // TODO: implement speed
+  int get speed => throw UnimplementedError();
+  
 }
 
 testIt() {
