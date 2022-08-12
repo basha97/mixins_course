@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
+import 'dart:io';
+import 'package:meta/meta.dart';
+import 'dart:convert';
 
 extension Log on Object {
   void log() => devtools.log(toString());
@@ -21,18 +24,36 @@ class Cat extends Animal with CanRun {
   int speed = 20;
 }
 
-class Dog with CanRun{
-  @override
-  // TODO: implement speed
-  int get speed => throw UnimplementedError();
-  
+extension GetOnUri on Object {
+  Future<HttpClientResponse> getUrl(String url) => HttpClient()
+      .getUrl(
+        Uri.parse(url),
+      )
+      .then(
+        (req) => req.close(),
+      );
 }
 
-testIt() {
-  final cat = Cat();
-  cat.run();
-  cat.speed = 40;
-  cat.run();
+mixin CanMakeGetCall {
+  String get url;
+  @useResult
+  Future<String> getString() => getUrl(
+        url,
+      ).then(
+        (res) => res.transform(utf8.decoder).join(),
+      );
+}
+
+@immutable
+class GetPeople with CanMakeGetCall {
+  const GetPeople();
+  @override
+  String get url => "http://192.168.1.13:5500/apis/people.json";
+}
+
+void testIt() async {
+  final people = await const GetPeople().getString();
+  people.log();
 }
 
 void main() {
